@@ -1,4 +1,4 @@
-from emg_exploration_utils import get_data, get_ch
+from emg_exploration_utils import get_data, get_ch, compute_rms
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,6 +40,29 @@ plt.xlabel("Frequency (Hz)")
 plt.ylabel("PSD (V²/Hz)")
 plt.title("Welch PSD")
 plt.grid(True, alpha=0.3)
+
+#===================== EMG + RMS PLOT =====================#
+# Convert to microvolts so units are interpretable (µV)
+ch_uv = np.asarray(ch_data, dtype=float) * 1e6
+ch_uv = np.nan_to_num(ch_uv, nan=0.0, posinf=0.0, neginf=0.0)
+ch_uv = ch_uv - np.mean(ch_uv)
+print("EMG (µV) min/mean/max:", float(np.min(ch_uv)), float(np.mean(ch_uv)), float(np.max(ch_uv)))
+
+t = np.arange(len(ch_uv)) / sfreq
+t_rms, rms = compute_rms(ch_uv, sfreq=sfreq, window_sec=30.0)
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+ax1.plot(t, ch_uv, color="C0", linewidth=0.6)
+ax1.set_ylabel("EMG (µV)")
+ax1.set_title("EMG Signal (top) and RMS Magnitude (bottom)")
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(t_rms, rms, color="C1", linewidth=1.2)
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("RMS (µV)")
+ax2.grid(True, alpha=0.3)
+
 plt.tight_layout()
 plt.show()
 

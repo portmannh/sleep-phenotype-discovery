@@ -39,3 +39,34 @@ def get_ch(raw, ch_name):
     except Exception as e:
         print(f"Channel List: {raw.ch_names}")
         raise ValueError(f"Unable to get channel data - {e}")
+
+
+def compute_rms(signal, sfreq, window_sec=30.0):
+    """
+    Compute RMS magnitude
+
+    Input:
+    - signal: 1D array-like - EMG signal
+    - sfreq: sampling frequency in Hz
+    - window_sec: window duration in seconds
+
+    Output:
+    - t_centers: time (s) for the center of each RMS window
+    - rms: RMS value for each window
+    """
+    x = np.asarray(signal, dtype=float)
+    x = np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+
+    samples_per_win = int(round(float(sfreq) * float(window_sec)))
+    if samples_per_win <= 0:
+        raise ValueError("window_sec must produce at least 1 sample per window.")
+
+    n_windows = len(x) // samples_per_win
+    if n_windows == 0:
+        raise ValueError("Signal shorter than one RMS window.")
+
+    x = x[: n_windows * samples_per_win].reshape(n_windows, samples_per_win) #keep only complete windows and reshape for RMS per epoch
+    rms = np.sqrt(np.mean(x**2, axis=1))
+
+    t_centers = (np.arange(n_windows) + 0.5) * window_sec
+    return t_centers, rms
