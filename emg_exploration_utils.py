@@ -70,3 +70,38 @@ def compute_rms(signal, sfreq, window_sec=30.0):
 
     t_centers = (np.arange(n_windows) + 0.5) * window_sec
     return t_centers, rms
+
+
+def plot_hypnogram(ax, annot, stage_map, stage_order, time_unit="s"):
+    """
+    Plot hypnogram on a provided axis using annotation labels.
+
+    Input:
+    - ax: matplotlib axis
+    - annot: mne.annotations.Annotations
+    - stage_map: dict mapping raw annotation description -> short stage label
+    - stage_order: dict mapping short stage label -> y value
+    - time_unit: "s" for seconds or "h" for hours
+    """
+    if len(annot) == 0:
+        raise ValueError("No annotations found to build hypnogram.")
+
+    descriptions = [str(d) for d in annot.description]
+    y = [stage_order[stage_map.get(d, "?")] for d in descriptions]
+    x = np.asarray(annot.onset, dtype=float)
+
+    if time_unit == "h":
+        x = x / 3600.0
+    elif time_unit != "s":
+        raise ValueError("time_unit must be 's' or 'h'.")
+
+    # Step-like hypnogram matching exploration notebook style.
+    x_step = np.repeat(x, 2)[1:]
+    y_step = np.repeat(y, 2)[:-1]
+
+    ax.plot(x_step, y_step, color="C2", linewidth=1.1)
+    ordered = list(stage_order.keys())
+    ax.set_yticks([stage_order[s] for s in ordered])
+    ax.set_yticklabels(ordered)
+    ax.invert_yaxis()
+    ax.grid(True, alpha=0.3)

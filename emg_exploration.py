@@ -1,4 +1,4 @@
-from emg_exploration_utils import get_data, get_ch, compute_rms
+from emg_exploration_utils import get_data, get_ch, compute_rms, plot_hypnogram
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +7,10 @@ from scipy.signal import welch
 # load file paths
 # define path to the data
 # ADAPT THIS PATH TO WHERE YOU HAVE THE DATA
-data_path = "../../data"
+plot_EMG_PSD = False
+plot_EMG_RMS = True
+
+data_path = r"C:\Users\i0342864\Desktop\PSilva\PhD\AI medical course\sleep-edf-database-expanded-1.0.0"
 
 folder_path = "sleep-edfx/1.0.0"
 sc = "sleep-cassette"
@@ -31,38 +34,45 @@ ch_data = get_ch(raw, "EMG submental")
 
 print(ch_data.shape)
 
-#===================== PSD (WELCH) =====================#
-f, pxx = welch(ch_data, fs=sfreq, nperseg=int(4 * sfreq))
-plt.figure(figsize=(10, 4))
-plt.semilogy(f, pxx)
-plt.xlim(0, sfreq / 2)
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("PSD (V²/Hz)")
-plt.title("Welch PSD")
-plt.grid(True, alpha=0.3)
+if plot_EMG_PSD:
+    #===================== PSD (WELCH) =====================#
+    f, pxx = welch(ch_data, fs=sfreq, nperseg=int(4 * sfreq))
+    plt.figure(figsize=(10, 4))
+    plt.semilogy(f, pxx)
+    plt.xlim(0, sfreq / 2)
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("PSD (V²/Hz)")
+    plt.title("Welch PSD")
+    plt.grid(True, alpha=0.3)
 
-#===================== EMG + RMS PLOT =====================#
-# Convert to microvolts so units are interpretable (µV)
-ch_uv = np.asarray(ch_data, dtype=float) * 1e6
-ch_uv = np.nan_to_num(ch_uv, nan=0.0, posinf=0.0, neginf=0.0)
-ch_uv = ch_uv - np.mean(ch_uv)
-print("EMG (µV) min/mean/max:", float(np.min(ch_uv)), float(np.mean(ch_uv)), float(np.max(ch_uv)))
+if plot_EMG_RMS:
+    #===================== EMG + RMS + HYPNOGRAM PLOT =====================#
+    # Convert to microvolts so units are interpretable (µV)
+    ch_uv = np.asarray(ch_data, dtype=float) * 1e6
+    ch_uv = np.nan_to_num(ch_uv, nan=0.0, posinf=0.0, neginf=0.0)
+    ch_uv = ch_uv - np.mean(ch_uv)
+    print("EMG (µV) min/mean/max:", float(np.min(ch_uv)), float(np.mean(ch_uv)), float(np.max(ch_uv)))
 
-t = np.arange(len(ch_uv)) / sfreq
-t_rms, rms = compute_rms(ch_uv, sfreq=sfreq, window_sec=30.0)
+    t = np.arange(len(ch_uv)) / sfreq
+    t_rms, rms = compute_rms(ch_uv, sfreq=sfreq, window_sec=30.0)
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+    fig, (ax1, ax2, ax3) = plt.subplots(
+        3, 1, figsize=(12, 8), sharex=True, gridspec_kw={"height_ratios": [2, 1, 1]}
+    )
 
-ax1.plot(t, ch_uv, color="C0", linewidth=0.6)
-ax1.set_ylabel("EMG (µV)")
-ax1.set_title("EMG Signal (top) and RMS Magnitude (bottom)")
-ax1.grid(True, alpha=0.3)
+    ax1.plot(t, ch_uv, color="C0", linewidth=0.6)
+    ax1.set_ylabel("EMG (µV)")
+    ax1.set_title("EMG Signal, RMS Magnitude, and Hypnogram")
+    ax1.grid(True, alpha=0.3)
 
-ax2.plot(t_rms, rms, color="C1", linewidth=1.2)
-ax2.set_xlabel("Time (s)")
-ax2.set_ylabel("RMS (µV)")
-ax2.grid(True, alpha=0.3)
+    ax2.plot(t_rms, rms, color="C1", linewidth=1.2)
+    ax2.set_ylabel("RMS (µV)")
+    ax2.grid(True, alpha=0.3)
 
-plt.tight_layout()
-plt.show()
+    plot_hypnogram(ax3, annot, stage_map, stage_order, time_unit="s")
+    ax3.set_ylabel("Stage")
+    ax3.set_xlabel("Time (s)")
+
+    plt.tight_layout()
+    plt.show()
 
