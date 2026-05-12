@@ -72,7 +72,35 @@ def compute_rms(signal, sfreq, window_sec=30.0):
     return t_centers, rms
 
 
-def plot_hypnogram(ax, annot, stage_map, stage_order, time_unit="s"):
+def emg_submental_rms(raw, window_sec=30.0, emg_ch="EMG submental"):
+    """
+    Submental EMG in µV and then RMS per window.
+
+    Input:
+    - raw: mne.io.BaseRaw - raw data
+    - window_sec: window duration in seconds
+    - emg_ch: EMG channel name
+    Output:
+    - t_centers : time (s) for the center of each RMS window
+    - rms_uv : RMS value for each window
+    """
+    try:
+        ch_data = get_ch(raw, emg_ch)
+    except (ValueError, KeyError, IndexError):
+        return None, None
+
+    ch_uv = np.asarray(ch_data, dtype=float) * 1e6
+    ch_uv = np.nan_to_num(ch_uv, nan=0.0, posinf=0.0, neginf=0.0)
+    ch_uv = ch_uv - np.mean(ch_uv)
+
+    sfreq = float(raw.info["sfreq"])
+    try:
+        return compute_rms(ch_uv, sfreq=sfreq, window_sec=window_sec)
+    except ValueError:
+        return None, None
+
+
+def plot_hypnogram(ax, annot, stage_map, stage_order, time_unit="s"): #Hannah's notebook
     """
     Plot hypnogram on a provided axis using annotation labels.
 
