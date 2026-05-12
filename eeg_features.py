@@ -134,7 +134,6 @@ for dataset_name, paths in datasets.items():
                 if col not in sw_single_row.columns:
                     sw_single_row[col] = 0
             sw_single_row.columns = [f'{col}_SW_density' for col in sw_single_row.columns]
-
         
         sp = yasa.spindles_detect(eeg, hypno=hyp, include=(2,3))
         if sp is None:
@@ -149,7 +148,6 @@ for dataset_name, paths in datasets.items():
                     sp_single_row[col] = 0
             sp_single_row.columns = [f'{col}_SP_density' for col in sp_single_row.columns]
 
-       
         # One row per recording: EEG band powers, EMG RMS by stage, hypnogram stats
         sample = pd.concat([single_row, sw_single_row, sp_single_row, emg_feats, sleep_stats], axis=1)
         sample["dataset"] = dataset_name
