@@ -65,9 +65,9 @@ STAGE_MAP      = {0: 'W', 1: 'N1', 2: 'N2', 3: 'N3', 4: 'R', -1: 'Uns'}
 # load file paths
 # define path to the data
 # ADAPT THIS PATH TO WHERE YOU HAVE THE DATA
-data_path = ".../data"
+data_path = "/data"
 
-folder_path = "sleep-edf-database-expanded-1.0.0"
+folder_path = "sleep-edfx/1.0.0"
 sc = "sleep-cassette"
 st = "sleep-telemetry"
 
@@ -90,6 +90,7 @@ for dataset_name, paths in datasets.items():
         hypno = eeg.annotations.description
         hyp = yasa.Hypnogram.from_integers(hypno, mapping=STAGE_MAP, n_stages=5, freq='30s')
 
+        # EMG features
         _, rms_uv = emg_submental_rms(raw, window_sec=EPOCH_DURATION)
         st_arr = _hyp_stages_int(hyp)
         emg_feats = _emg_rms_feature_row(rms_uv, st_arr)
@@ -112,12 +113,50 @@ for dataset_name, paths in datasets.items():
         sleep_stats = pd.DataFrame(hyp.sleep_statistics(), index=[0])
         sleep_stats = sleep_stats.drop(columns=["TIB", "SOL", "SOL_5min", "SE" ])
 
+        # compute number of seconds in N2 and N3
+        nrem_sec = np.sum((hypno=='2')|(hypno=='3'))*EPOCH_DURATION
+
+        # detect slow waves and spindles
+        sw = yasa.sw_detect(eeg, hypno=hyp, include=(2,3))
+        if sw is None:
+            sw_single_row = pd.DataFrame({f'{col}_SW_density': 0 for col in EEG_CHANNELS}, index=[0])
+        else:
+            sw_counts = sw.summary(grp_chan=True).reset_index() # slow wave count per EEG channel
+            # compute slow wave and spindle density in sw/sp per minute
+            sw_counts['SW_density'] = sw_counts['Count']/nrem_sec*60
+
+            # convert format into one row
+            sw_single_row = sw_counts.pivot_table(index=None, columns='Channel', values='SW_density', aggfunc='first')
+            sw_single_row = sw_single_row.reset_index(drop=True)
+            for col in EEG_CHANNELS:
+                if col not in sw_single_row.columns:
+                    sw_single_row[col] = 0
+            sw_single_row.columns = [f'{col}_SW_density' for col in sw_single_row.columns]
+
+        
+        sp = yasa.spindles_detect(eeg, hypno=hyp, include=(2,3))
+        if sp is None:
+            sp_single_row = pd.DataFrame({f'{col}_SP_density': 0 for col in EEG_CHANNELS}, index=[0])
+        else:
+            sp_counts = sp.summary(grp_chan=True).reset_index() # spindle count per EEG channel
+            sp_counts['SP_density'] = sp_counts['Count']/nrem_sec*60
+            sp_single_row = sp_counts.pivot_table(index=None, columns='Channel', values='SP_density', aggfunc='first')
+            sp_single_row = sp_single_row.reset_index(drop=True)
+            for col in EEG_CHANNELS:
+                if col not in sp_single_row.columns:
+                    sp_single_row[col] = 0
+            sp_single_row.columns = [f'{col}_SP_density' for col in sp_single_row.columns]
+
+       
         # One row per recording: EEG band powers, EMG RMS by stage, hypnogram stats
-        sample = pd.concat([single_row, emg_feats, sleep_stats], axis=1)
+        sample = pd.concat([single_row, sw_single_row, sp_single_row, emg_feats, sleep_stats], axis=1)
         sample["dataset"] = dataset_name
         sample["file"] = path
 
         all_dfs.append(sample)
 
 df = pd.concat(all_dfs, ignore_index=True)
-print(df)
+
+fname = "features.csv"
+
+df.to_csv(fname)
