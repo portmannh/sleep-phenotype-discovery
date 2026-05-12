@@ -13,14 +13,12 @@ import pandas as pd
 
 from emg_exploration_utils import emg_submental_rms
 
-EMG_STAGE_LABELS = {0: "W", 1: "N1", 2: "N2", 3: "N3", 4: "R"}
-
-
 def _hyp_stages_int(hyp):
     if hasattr(hyp, "as_int"):
         st = hyp.as_int()
         return st.to_numpy() if hasattr(st, "to_numpy") else np.asarray(st, dtype=int)
     inv = {"W": 0, "N1": 1, "N2": 2, "N3": 3, "R": 4, "Uns": -1}
+    inv = {v: k for k, v in STAGE_MAP.items()}
     hypno_vals = getattr(hyp, "hypno", None)
     if hypno_vals is None:
         return None
@@ -29,8 +27,9 @@ def _hyp_stages_int(hyp):
 
 def _emg_rms_feature_row(rms_uv, st_arr):
     """One wide row: mean/std RMS per stage 0–4 and across aligned epochs."""
+    emg_stage_labels = {k: v for k, v in STAGE_MAP.items() if k >= 0}
     cols = {}
-    for lab in EMG_STAGE_LABELS.values():
+    for lab in emg_stage_labels.values():
         cols[f"EMG_submental_RMS_mean_{lab}"] = np.nan
         cols[f"EMG_submental_RMS_std_{lab}"] = np.nan
     cols["EMG_submental_RMS_mean_all"] = np.nan
@@ -48,7 +47,7 @@ def _emg_rms_feature_row(rms_uv, st_arr):
     rms_uv = rms_uv[:n]
     st_arr = st_arr[:n]
 
-    for si, lab in EMG_STAGE_LABELS.items():
+    for si, lab in emg_stage_labels.items():
         mask = st_arr == si
         if np.any(mask):
             cols[f"EMG_submental_RMS_mean_{lab}"] = float(np.mean(rms_uv[mask]))
@@ -66,9 +65,9 @@ STAGE_MAP      = {0: 'W', 1: 'N1', 2: 'N2', 3: 'N3', 4: 'R', -1: 'Uns'}
 # load file paths
 # define path to the data
 # ADAPT THIS PATH TO WHERE YOU HAVE THE DATA
-data_path = "../../data"
+data_path = ".../data"
 
-folder_path = "sleep-edfx/1.0.0"
+folder_path = "sleep-edf-database-expanded-1.0.0"
 sc = "sleep-cassette"
 st = "sleep-telemetry"
 
@@ -92,11 +91,8 @@ for dataset_name, paths in datasets.items():
         hyp = yasa.Hypnogram.from_integers(hypno, mapping=STAGE_MAP, n_stages=5, freq='30s')
 
         _, rms_uv = emg_submental_rms(raw, window_sec=EPOCH_DURATION)
-        print(f"RMS shape: {rms_uv.shape}")
         st_arr = _hyp_stages_int(hyp)
-        print(f"Stages: {st_arr}")
         emg_feats = _emg_rms_feature_row(rms_uv, st_arr)
-        print(f"EMG features: {emg_feats}")
 
         # compute bandpowers
         bp = yasa.bandpower(data=eeg, hypno=hyp, include=(0, 1, 2, 3, 4))
