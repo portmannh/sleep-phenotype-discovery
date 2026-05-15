@@ -10,6 +10,7 @@ import glob
 import yasa
 import numpy as np
 import pandas as pd
+import numpy as np
 
 from emg_exploration_utils import emg_submental_rms
 
@@ -65,9 +66,9 @@ STAGE_MAP      = {0: 'W', 1: 'N1', 2: 'N2', 3: 'N3', 4: 'R', -1: 'Uns'}
 # load file paths
 # define path to the data
 # ADAPT THIS PATH TO WHERE YOU HAVE THE DATA
-data_path = "/data"
+data_path = "/home/alexia/Downloads/"
 
-folder_path = "sleep-edfx/1.0.0"
+folder_path = "sleep-edf-database-expanded-1.0.0"
 sc = "sleep-cassette"
 st = "sleep-telemetry"
 
@@ -75,6 +76,7 @@ sc_paths = sorted(glob.glob(f"{data_path}/{folder_path}/{sc}/preprocessed/*.fif"
 st_paths = sorted(glob.glob(f"{data_path}/{folder_path}/{st}/preprocessed/*.fif"))
 
 datasets = {'sc': sc_paths, 'st': st_paths}
+include_stages = []
 
 all_dfs = []
 
