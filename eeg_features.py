@@ -65,9 +65,9 @@ STAGE_MAP      = {0: 'W', 1: 'N1', 2: 'N2', 3: 'N3', 4: 'R', -1: 'Uns'}
 # load file paths
 # define path to the data
 # ADAPT THIS PATH TO WHERE YOU HAVE THE DATA
-data_path = "/data"
+data_path = "D:"
 
-folder_path = "sleep-edfx/1.0.0"
+folder_path = "AI medical course"
 sc = "sleep-cassette"
 st = "sleep-telemetry"
 
