@@ -64,12 +64,12 @@ def run_dbscan_clustering(feature_matrix, title, eps=1.5, minPts=5, index=None):
     return clustered, labels, X_fit
 
 
-def plot_cluster_embedding(coords, labels, title, xlabel="Dim 1", ylabel="Dim 2"):
-    """Scatter plot of 2D embedding coloured by cluster label."""
+def plot_cluster_embedding(coords, labels, title, xlabel="UMAP 1", ylabel="UMAP 2"):
+    """Scatter plot of 2D coordinates coloured by cluster label."""
     fig, ax = plt.subplots(figsize=(8, 6))
     sc = ax.scatter(
-        coords[:, 0],
-        coords[:, 1],
+        np.asarray(coords)[:, 0],
+        np.asarray(coords)[:, 1],
         c=labels,
         cmap="tab10",
         s=45,
@@ -81,5 +81,38 @@ def plot_cluster_embedding(coords, labels, title, xlabel="Dim 1", ylabel="Dim 2"
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     plt.colorbar(sc, ax=ax, label="cluster")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_dbscan_panels(results, suptitle="DBSCAN on UMAP embeddings"):
+    """Plot one row of UMAP scatter panels coloured by DBSCAN labels.
+
+    Parameters
+    ----------
+    results : list of (coords, labels, title)
+    """
+    fig, axes = plt.subplots(1, len(results), figsize=(5 * len(results), 4.5))
+    if len(results) == 1:
+        axes = [axes]
+
+    for ax, (coords, labels, title) in zip(axes, results):
+        coords = np.asarray(coords)
+        sc = ax.scatter(
+            coords[:, 0],
+            coords[:, 1],
+            c=labels,
+            cmap="tab10",
+            s=30,
+            alpha=0.85,
+            edgecolors="k",
+            linewidths=0.25,
+        )
+        ax.set_title(title)
+        ax.set_xlabel("UMAP 1")
+        ax.set_ylabel("UMAP 2")
+        ax.grid(True, alpha=0.3)
+
+    fig.suptitle(suptitle, y=1.02)
     plt.tight_layout()
     plt.show()
