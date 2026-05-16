@@ -116,4 +116,4 @@ torch
 scikit-learn
 umap-learn
 seaborn
-
+optuna
