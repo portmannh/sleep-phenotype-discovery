@@ -1,0 +1,15 @@
+{
+  "method": "kmeans",
+  "final_objective_composite_healthy_reference": 0.7105612538281072,
+  "final_silhouette_healthy_reference": 0.529456615447998,
+  "final_davies_bouldin_healthy_reference": 0.7118261778758935,
+  "best_latent_dim": 16,
+  "best_n_conv_blocks": 2,
+  "best_filters_base": 16,
+  "best_kernel_size": 3,
+  "best_learning_rate": 0.0001546175155362726,
+  "best_n_clusters": 6,
+  "best_umap_n_neighbors": 5,
+  "best_umap_n_components": 3,
+  "best_umap_min_dist": 0.1
+}

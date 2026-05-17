@@ -1,0 +1,54 @@
+{
+  "method": "gmm",
+  "best_params": {
+    "latent_dim": 16,
+    "n_conv_blocks": 2,
+    "filters_base": 16,
+    "kernel_size": 3,
+    "learning_rate": 0.00012997321091007063,
+    "n_clusters": 3,
+    "umap_n_neighbors": 5,
+    "umap_n_components": 2,
+    "umap_min_dist": 0.1
+  },
+  "fixed_model_params": {
+    "seq_len": 960,
+    "channels": 16,
+    "kernel_size": 3,
+    "weight_decay": 0.0001,
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss(ignore_index=5)",
+    "umap_n_neighbors": 5,
+    "umap_n_components": 2,
+    "umap_min_dist": 0.1,
+    "umap_seed": 42,
+    "kmeans_init": null
+  },
+  "training_summary": {
+    "best_val_loss": 1.3810176849365234,
+    "final_train_loss": 1.4218864440917969,
+    "epochs_run": 40
+  },
+  "final_objective_composite_healthy_reference": 0.6678559760453902,
+  "final_silhouette_healthy_reference": 0.42982444167137146,
+  "final_davies_bouldin_healthy_reference": 0.7919282078474851,
+  "stability": {},
+  "healthy_cluster_counts": {
+    "0": 46,
+    "1": 58,
+    "2": 49
+  },
+  "st_assigned_cluster_counts": {
+    "0": 16,
+    "1": 15,
+    "2": 13
+  },
+  "n_healthy_records": 153,
+  "n_st_records": 44,
+  "output_dirs": {
+    "method_dir": "C:\\Users\\ebenc\\PycharmProjects\\Project AI in TimeSeries\\sleep-phenotype-discovery\\hpo_results\\gmm",
+    "model_dir": "C:\\Users\\ebenc\\PycharmProjects\\Project AI in TimeSeries\\sleep-phenotype-discovery\\hpo_results\\gmm\\model",
+    "plots_dir": "C:\\Users\\ebenc\\PycharmProjects\\Project AI in TimeSeries\\sleep-phenotype-discovery\\hpo_results\\gmm\\plots"
+  },
+  "note": "This HPO script uses only hypnogram stage sequences as model input. The objective uses only internal cluster validity: normalized Silhouette and transformed Davies-Bouldin on SC/healthy reference clusters. Sleep-stage percentage summaries are saved only as post-hoc plots/tables after final clustering; they are not used in HPO, representation learning, UMAP fitting, or cluster fitting."
+}

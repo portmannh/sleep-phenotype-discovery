@@ -1,0 +1,39 @@
+{
+  "method": "agglomerative",
+  "best_value_composite_objective": 0.7870990628457378,
+  "best_trial_number": 117,
+  "best_params": {
+    "latent_dim": 128,
+    "n_conv_blocks": 3,
+    "filters_base": 32,
+    "kernel_size": 11,
+    "learning_rate": 0.0005516455200122224,
+    "n_clusters": 3,
+    "umap_n_neighbors": 30,
+    "umap_n_components": 2,
+    "umap_min_dist": 0.1
+  },
+  "best_trial_user_attrs": {
+    "best_val_loss": 0.9839225709438324,
+    "cluster_counts": {
+      "0": 52,
+      "1": 41,
+      "2": 28
+    },
+    "davies_bouldin": 0.45163363380435156,
+    "epochs_run": 20,
+    "filters_base": 32,
+    "kernel_size": 11,
+    "latent_dim": 128,
+    "learning_rate": 0.0005516455200122224,
+    "n_clusters": 3,
+    "n_conv_blocks": 3,
+    "objective_composite": 0.7870990628457378,
+    "silhouette": 0.6583867073059082,
+    "trial_seed": 2159,
+    "umap_min_dist": 0.1,
+    "umap_n_components": 2,
+    "umap_n_neighbors": 30,
+    "umap_seed": 42
+  }
+}

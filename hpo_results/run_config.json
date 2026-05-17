@@ -1,0 +1,112 @@
+{
+  "args": {
+    "data_dir": "C:\\Users\\ebenc\\PycharmProjects\\Project AI in TimeSeries\\sleep-phenotype-discovery\\sleep-edf-database",
+    "out_dir": "C:\\Users\\ebenc\\PycharmProjects\\Project AI in TimeSeries\\sleep-phenotype-discovery",
+    "cluster_methods": [
+      "hdbscan"
+    ],
+    "n_trials": 100,
+    "epochs": 20,
+    "final_epochs": 40,
+    "batch_size": 32,
+    "seed": 42,
+    "study_name": "sleepedf_fif_healthy_reference_hpo",
+    "storage": "sqlite:///study.db",
+    "n_jobs": 4,
+    "umap_seed": 42,
+    "stability_runs": 1,
+    "st_placebo_night_digit": "1",
+    "st_temazepam_night_digit": "2"
+  },
+  "hpo_search_space": {
+    "latent_dim": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "n_conv_blocks": [
+      1,
+      2,
+      3
+    ],
+    "filters_base": [
+      16,
+      32,
+      64
+    ],
+    "kernel_size": [
+      3,
+      7,
+      11
+    ],
+    "learning_rate": [
+      0.0001,
+      0.003,
+      "log"
+    ],
+    "n_clusters": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "hdbscan_min_cluster_size": [
+      10,
+      15,
+      20,
+      30
+    ],
+    "hdbscan_min_samples": [
+      null,
+      3,
+      5,
+      10,
+      15
+    ],
+    "hdbscan_cluster_selection_method": [
+      "eom",
+      "leaf"
+    ],
+    "hdbscan_metric": "euclidean",
+    "umap_n_neighbors": [
+      5,
+      10,
+      15,
+      30
+    ],
+    "umap_n_components": [
+      2,
+      3,
+      5
+    ],
+    "umap_min_dist": [
+      0.0,
+      0.05,
+      0.1,
+      0.3
+    ]
+  },
+  "fixed_params": {
+    "seq_len": 960,
+    "weight_decay": 0.0001,
+    "optimizer": "Adam",
+    "batch_size": 32,
+    "umap_seed": 42,
+    "hpo_objective": "0.70 * normalized_silhouette + 0.30 * transformed_davies_bouldin",
+    "sleep_posthoc_metrics": "computed only after final clustering for visualization; not used in HPO objective",
+    "output_layout": "per method: model/ contains .pt and .npy artefacts; plots/ contains .png and plot source tables",
+    "st_treatment_mapping": "uses explicit Sleep Telemetry subject-night table; CLI night digits are fallback only",
+    "st_placebo_night_digit": "1",
+    "st_temazepam_night_digit": "2",
+    "kmeans_init": "k-means++",
+    "hdbscan_guardrails": {
+      "min_clusters_without_noise": 2,
+      "max_clusters_without_noise": 8,
+      "max_noise_fraction": 0.4,
+      "min_clustered_fraction": 0.6
+    },
+    "stability_runs": 1
+  }
+}

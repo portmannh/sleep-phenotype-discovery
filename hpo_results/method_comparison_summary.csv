@@ -1,0 +1,4 @@
+method,final_objective_composite_healthy_reference,final_silhouette_healthy_reference,final_davies_bouldin_healthy_reference,best_latent_dim,best_n_conv_blocks,best_filters_base,best_kernel_size,best_learning_rate,best_n_clusters,best_umap_n_neighbors,best_umap_n_components,best_umap_min_dist
+kmeans,0.7105612538281072,0.529456615447998,0.7118261778758935,16,2,16,3,0.0001546175155362726,6,5,3,0.1
+gmm,0.6678559760453902,0.42982444167137146,0.7919282078474851,16,2,16,3,0.00012997321091007063,3,5,2,0.1
+agglomerative,0.615942273584952,0.3128964304924011,0.9178088139820518,128,3,32,11,0.0005516455200122224,3,30,2,0.1
